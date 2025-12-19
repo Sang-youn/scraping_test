@@ -6,7 +6,7 @@
 - 예 : /Volumes/{PATH}/chromedriver-mac-arm64/chromedriver
 
 2. 필요 패키지를 설치한다(`requirements.txt`에 기술되어 있다)
-- pip3 -r requirements.txt
+- pip3 install -r requirements.txt
 
 3. 실행파일은 main.py 로 한다
 
