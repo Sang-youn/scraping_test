@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup as bs
 import os
 import time
 
+# 구글 검색 결과 추출
 def google_search_result(result):
   result_list = []
   if result.select_one('a[jsname="UWckNb"]') :
@@ -31,7 +32,7 @@ google_search = {
   'search_box': 'textarea[name="q"]',
   'search_button': 'input[type="submit"][name="btnK"]',
   'search_results': 'div.MjjYud > div.A6K0A',
-  'select' : google_search_result
+  'select' : google_search_result # 구글 검색 결과 추출 함수를 dict에 저장
 }
 
 
