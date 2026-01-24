@@ -8,23 +8,38 @@ import time
 
 # 구글 검색 결과 추출
 def google_search_result(result):
-  result_list = []
   if result.select_one('a[jsname="UWckNb"]') :
     desc_elem = list(map(lambda x: f'div[style="-webkit-line-clamp:{x}"]', [1,2,3]))
     desc = ','.join(desc_elem)
-    
+    # print(desc)
     result_dict = {
       'site': ' || '.join(list(map(lambda x: x.text, result.select_one('div.CA5RN').select('div')))),
       'title': result.select_one('a[jsname="UWckNb"] > h3').text,
       'url': result.select_one('a[jsname="UWckNb"]').get('href'),
-      'desc': result.select_one(desc).text,
+      'desc': result.select_one(desc).text if result.select_one(desc) else '',
       'rpos': result.get('data-rpos', '9999')
     }
-    result_list.append(result_dict)
+    return result_dict
   else:
     pass
   
-  return result_list
+
+# 네이버 검색 결과 추출 함수
+def naver_search_result(result):
+  if result.select_one('a[jsname="UWckNb"]') :
+    desc_elem = list(map(lambda x: f'div[style="-webkit-line-clamp:{x}"]', [1,2,3]))
+    desc = ', '.join(desc_elem)
+    print(desc)
+    result_dict = {
+      'site': ' || '.join(list(map(lambda x: x.text, result.select_one('div.CA5RN').select('div')))),
+      'title': result.select_one('a[jsname="UWckNb"] > h3').text,
+      'url': result.select_one('a[jsname="UWckNb"]').get('href'),
+      'desc': result.select_one(desc).text if result.select_one(desc) else '',
+      'rpos': result.get('data-rpos', '9999')
+    }
+    return result_dict
+  else:
+    pass
 
 # 구글 검색 정보
 google_search = {
@@ -32,12 +47,22 @@ google_search = {
   'search_box': 'textarea[name="q"]',
   'search_button': 'input[type="submit"][name="btnK"]',
   'search_results': 'div.MjjYud > div.A6K0A',
+  'page_next': 'div[role="navigation"] > table.AaVjTc > tbody > tr > td.NKTSme > a',
   'select' : google_search_result # 구글 검색 결과 추출 함수를 dict에 저장
 }
 
+# 네이버 검색 정보
+naver_search = {
+  'url': 'https://www.naver.com',
+  'search_box': 'textarea[name="q"]',
+  'search_button': 'input[type="submit"][name="btnK"]',
+  'search_results': 'div.MjjYud > div.A6K0A',
+  'page_next': 'div[role="navigation"] > table.AaVjTc > tbody > tr > td.NKTSme > a[aria-label="2"]',
+  'select' : naver_search_result # 네이버 검색 결과 추출 함수를 dict에 저장
+}
 
 # 검색 타입(일단 구글만 먼저)
-srch_dict = {'google': google_search}
+srch_dict = {'google': google_search, 'naver': naver_search}
 
 class ChromiumScraper:
 
@@ -67,7 +92,7 @@ class ChromiumScraper:
   def __exit__(self, exc_type, exc_value, traceback):
       print("ChromiumScraper __exit__")
       self.driver.quit()
-  
+
   # 검색 시작
   def search(self, keyword):
     print(f"ChromiumScraper search: {keyword}")
@@ -81,9 +106,18 @@ class ChromiumScraper:
     time.sleep(1)
     return self.driver.page_source
 
+  def page_next(self):
+    elem = self.driver.find_element(By.CSS_SELECTOR, self.srch_info['page_next'])
+    elem.click()
+    time.sleep(1)
+    return self.driver.page_source
+
   def get_search_results(self, page_source):
     soup = bs(page_source, 'html.parser')
     search_results = soup.select(self.srch_info['search_results'])
-    return list(map(lambda x: self.srch_info['select'](x), search_results))
-    
+    print(len(search_results))
+    # return list(map(lambda x: self.srch_info['select'](x), search_results))
+    list_results = []
+    list_results.extend(list(map(lambda x: self.srch_info['select'](x), search_results)))
+    return list_results
     
