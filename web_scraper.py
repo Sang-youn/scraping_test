@@ -81,6 +81,17 @@ class ChromiumScraper:
       options = webdriver.ChromeOptions()
       # 로봇이 아닙니다 방지
       options.add_argument("--disable-blink-features=AutomationControlled")
+      options.add_argument("--headless=new")
+      options.add_argument("--disable-gpu")
+      options.add_argument("--no-sandbox")
+      options.add_argument("--disable-dev-shm-usage")
+      options.add_argument("--window-size=1920,1080") # 창 크기 명시
+      
+      options.add_argument(
+        "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/120.0.0.0 Safari/537.36"
+      )
       self.driver = webdriver.Chrome(service=service, options=options)
       return self
     
@@ -120,4 +131,3 @@ class ChromiumScraper:
     list_results = []
     list_results.extend(list(map(lambda x: self.srch_info['select'](x), search_results)))
     return list_results
-    
