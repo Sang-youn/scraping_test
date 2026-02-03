@@ -4,7 +4,7 @@ import sys
 from word_cloud import create_wordcloud
 from datetime import datetime
 import os
-
+from keyword_analysis import keyword_analysis, save_keyword_analysis
 
 def main():
   
@@ -27,6 +27,15 @@ def main():
         os.makedirs(f'./{datetime.now().strftime("%Y%m%d")}')
       print('--------------------------------')
       create_wordcloud(' '.join(list(map(lambda x: x['desc'], unique_data))), f'./{datetime.now().strftime("%Y%m%d")}/{srch_type}_{keyword.strip()}_{datetime.now().strftime("%H%M")}.png')
+      
+      # 키워드 분석 추가
+      # csv 폴더 추가
+      if not os.path.exists(f'./csv'):
+        os.makedirs(f'./csv')
+      top_keywords = keyword_analysis(' '.join(list(map(lambda x: x['desc'], unique_data))))
+      # 키워드 분석 저장
+      # {keyword}_keyword_analysis.csv 로 저장된다
+      save_keyword_analysis(top_keywords, f'./csv/{keyword.strip()}_keyword_analysis.csv')
       print('--------------------------------')
 
 # 중복제거
